@@ -1,0 +1,316 @@
+<!-- 2572027 - Silalahi, Lorenzo Julio Pardamean -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Converter - 2572027</title>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .converter-panel {
+            display: none;
+        }
+
+        .converter-panel.active {
+            display: block;
+        }
+
+        .result-box,
+        .formula-note {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Unit Converter</h1>
+    <p>Konversi satuan suhu, panjang, dan berat dengan mudah</p>
+    <!-- Tab buttons -->
+    <div>
+        <button onclick="gantiTab('suhu')">Suhu</button>
+        <button onclick="gantiTab('panjang')">Panjang</button>
+        <button onclick="gantiTab('berat')">Berat</button>
+    </div>
+
+    <div id="suhu" class="converter-panel active">
+        <h3> Suhu </h3>
+        <form>
+            <label for="convert1">Dari :</label>
+            <select name="convert1" id="convert1">
+                <option value="C">Celsius</option>
+                <option value="F">Fahrenheit</option>
+                <option value="K">Kelvin</option>
+            </select>
+
+            <button type="button" onclick="swap('convert1', 'convert2')">Tukar</button>
+
+            <label for="convert2">Ke :</label>
+            <select name="convert2" id="convert2">
+                <option value="C">Celsius</option>
+                <option value="F">Fahrenheit</option>
+                <option value="K">Kelvin</option>
+            </select>
+
+            <br>
+
+            <label for="inputNilai">Nilai: </label>
+            <input type="number" id="inputNilai" placeholder="Contoh: 100">
+            <span class="error" style="color: red; display: none; margin-left: 10px;"></span>
+            <br><br>
+
+            <button type="button" onclick="konversi('suhu')">Konversi</button>
+            <div class="result-box"></div>
+            <div class="formula-note"></div>
+        </form>
+    </div>
+    <div id="panjang" class="converter-panel">
+        <h3> Panjang </h3>
+        <form>
+            <label for="convert1">Dari :</label>
+            <select name="convert1" id="convert1">
+                <option value="m">Meter</option>
+                <option value="km">Kilometer</option>
+                <option value="cm">Centimeter</option>
+                <option value="mm">Milimeter</option>
+                <option value="mi">Mil</option>
+                <option value="ft">Kaki</option>
+                <option value="in">Inci</option>
+            </select>
+
+            <button type="button" onclick="swap('convert1', 'convert2')">Tukar</button>
+
+            <label for="convert2">Ke :</label>
+            <select name="convert2" id="convert2">
+                <option value="m">Meter</option>
+                <option value="km">Kilometer</option>
+                <option value="cm">Centimeter</option>
+                <option value="mm">Milimeter</option>
+                <option value="mi">Mil</option>
+                <option value="ft">Kaki</option>
+                <option value="in">Inci</option>
+            </select>
+
+            <br>
+
+            <label for="inputNilai">Nilai: </label>
+            <input type="number" id="inputNilai" placeholder="Contoh: 100">
+            <span class="error" style="color: red; display: none; margin-left: 10px;"></span>
+            <br><br>
+
+            <button type="button" onclick="konversi('panjang')">Konversi</button>
+            <div class="result-box"></div>
+            <div class="formula-note"></div>
+        </form>
+    </div>
+    <div id="berat" class="converter-panel">
+        <h3> Berat </h3>
+        <form>
+            <label for="convert1">Dari :</label>
+            <select name="convert1" id="convert1">
+                <option value="g">Gram</option>
+                <option value="kg">Kilogram</option>
+                <option value="mg">Miligram</option>
+                <option value="lb">Pound</option>
+                <option value="oz">Ounce</option>
+                <option value="ton">Ton</option>
+            </select>
+
+            <button type="button" onclick="swap('convert1', 'convert2')">Tukar</button>
+
+            <label for="convert2">Ke :</label>
+            <select name="convert2" id="convert2">
+                <option value="g">Gram</option>
+                <option value="kg">Kilogram</option>
+                <option value="mg">Miligram</option>
+                <option value="lb">Pound</option>
+                <option value="oz">Ounce</option>
+                <option value="ton">Ton</option>
+            </select>
+
+            <br>
+
+            <label for="inputNilai">Nilai: </label>
+            <input type="number" id="inputNilai" placeholder="Contoh: 100">
+            <span class="error" style="color: red; display: none; margin-left: 10px;"></span>
+            <br><br>
+
+            <button type="button" onclick="konversi('berat')">Konversi</button>
+            <div class="result-box"></div>
+            <div class="formula-note"></div>
+        </form>
+    </div>
+
+    <!-- Tiap panel: class="converter-panel", id="panel-suhu/panjang/berat" -->
+    <!-- Panel Suhu: aktif (class active), Panel lain: tidak aktif -->
+    <!-- Di setiap panel ada: -->
+    <!-- - Select "Dari" dan Select "Ke" dengan tombol swap -->
+    <!-- - Input angka -->
+    <!-- - Pesan error (<span class="error">) -->
+    <!-- - Tombol Konversi -->
+    <!-- - Kotak hasil (display:none di awal) -->
+    <!-- - Catatan formula/rumus (display:none di awal) -->
+
+    <script>
+        function gantiTab(tabId) {
+            var panels = document.querySelectorAll('.converter-panel');
+
+            for (var i = 0; i < panels.length; i++) {
+                panels[i].classList.remove('active');
+            }
+
+            var panelAktif = document.getElementById(tabId);
+            panelAktif.classList.add('active');
+        }
+        function swap(idDari, idKe) {
+            var panelAktif = document.querySelector('.converter-panel.active');
+
+            var selectDari = panelAktif.querySelector('select[name="' + idDari + '"]');
+            var selectKe = panelAktif.querySelector('select[name="' + idKe + '"]');
+
+            var tmp = selectDari.value;
+            selectDari.value = selectKe.value;
+            selectKe.value = tmp;
+        }
+
+        // Ngonversi suhu
+        function keC(nilai, dari) {
+            if (dari === 'C') return nilai;
+            if (dari === 'F') return (nilai - 32) * 5 / 9;
+            if (dari === 'K') return nilai - 273.15;
+        }
+
+        function dariC(nilaiC, ke) {
+            if (ke === 'C') return nilaiC;
+            if (ke === 'F') return (nilaiC * 9 / 5) + 32;
+            if (ke === 'K') return nilaiC + 273.15;
+        }
+
+        function dapatkanRumusSuhu(dari, ke) {
+            if (dari === ke) return "Tidak ada konversi (satuan sama)";
+            if (dari === 'C' && ke === 'F') return "°F = (°C × 9/5) + 32";
+            if (dari === 'C' && ke === 'K') return "K = °C + 273.15";
+            if (dari === 'F' && ke === 'C') return "°C = (°F − 32) × 5/9";
+            if (dari === 'F' && ke === 'K') return "K = (°F − 32) × 5/9 + 273.15";
+            if (dari === 'K' && ke === 'C') return "°C = K − 273.15";
+            if (dari === 'K' && ke === 'F') return "°F = (K − 273.15) × 9/5 + 32";
+        }
+
+        var faktorPanjang = {
+            'm': 1,
+            'km': 1000,
+            'cm': 0.01,
+            'mm': 0.001,
+            'mi': 1609.34,
+            'ft': 0.3048,
+            'in': 0.0254
+        };
+
+        var faktorBerat = {
+            'g': 1,
+            'kg': 1000,
+            'mg': 0.001,
+            'lb': 453.592,
+            'oz': 28.3495,
+            'ton': 1000000
+        };
+
+        // simpan nama satuan panjang 
+        var namaPanjang = {
+            'm': 'Meter', 'km': 'Kilometer', 'cm': 'Centimeter',
+            'mm': 'Milimeter', 'mi': 'Mil', 'ft': 'Kaki', 'in': 'Inci'
+        };
+
+        function dapatkanRumusPanjang(dari, ke) {
+            if (dari === ke) return "Tidak ada konversi (satuan sama)";
+            var faktor = faktorPanjang[dari] / faktorPanjang[ke];
+            // rapihin hasil 
+            var faktorTeks = parseFloat(faktor.toPrecision(7)).toString();
+            return namaPanjang[ke] + " = " + namaPanjang[dari] + " × " + faktorTeks;
+        }
+
+        // simpan nama  satuan berat
+        var namaBerat = {
+            'g': 'Gram', 'kg': 'Kilogram', 'mg': 'Miligram',
+            'lb': 'Pound', 'oz': 'Ounce', 'ton': 'Ton'
+        };
+
+        function dapatkanRumusBerat(dari, ke) {
+            if (dari === ke) return "Tidak ada konversi (satuan sama)";
+            var faktor = faktorBerat[dari] / faktorBerat[ke];
+            var faktorTeks = parseFloat(faktor.toPrecision(7)).toString();
+            return namaBerat[ke] + " = " + namaBerat[dari] + " × " + faktorTeks;
+        }
+        function konversi(tipe) {
+            var panelAktif = document.querySelector('.converter-panel.active');
+            var inputElemen = panelAktif.querySelector('#inputNilai');
+            var selectDari = panelAktif.querySelector('select[id="convert1"]');
+            var selectKe = panelAktif.querySelector('select[id="convert2"]');
+            var errorElemen = panelAktif.querySelector('.error');
+            var resultBox = panelAktif.querySelector('.result-box');
+            var formulaNote = panelAktif.querySelector('.formula-note');
+
+            var nilaiInput = parseFloat(inputElemen.value);
+            var dari = selectDari.value;
+            var ke = selectKe.value;
+            // cek kalo user ga masukin apa apa 
+            if (isNaN(nilaiInput)) {
+                errorElemen.textContent = "Harap masukkan nilai angka yang valid!";
+                errorElemen.style.display = "inline";
+                resultBox.style.display = "none";
+                formulaNote.style.display = "none";
+                return;
+            } else {
+                errorElemen.style.display = "none";
+            }
+
+            var hasil = 0;
+            var rumusTeks = "";
+            if (tipe === 'suhu') {
+                var nilaiC = keC(nilaiInput, dari);
+                hasil = dariC(nilaiC, ke);
+                rumusTeks = dapatkanRumusSuhu(dari, ke);
+            }
+            else if (tipe === 'panjang') {
+                var nilaiMeter = nilaiInput * faktorPanjang[dari];
+                hasil = nilaiMeter / faktorPanjang[ke];
+                rumusTeks = dapatkanRumusPanjang(dari, ke);
+            }
+            else if (tipe === 'berat') {
+                var nilaiGram = nilaiInput * faktorBerat[dari];
+                hasil = nilaiGram / faktorBerat[ke];
+                rumusTeks = dapatkanRumusBerat(dari, ke);
+            }
+
+            // batesin angka dibelakang koma 
+            if (hasil % 1 !== 0) {
+                hasil = parseFloat(hasil.toFixed(4));
+            }
+            resultBox.innerHTML = "<b>Hasil:</b> " + hasil + " " + ke + "<br>" + nilaiInput + " " + dari + " = " + hasil + " " + ke;
+            resultBox.style.display = "block";
+
+            formulaNote.innerHTML = "Rumus = " + rumusTeks;
+            formulaNote.style.display = "block";
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                var panelAktif = document.querySelector('.converter-panel.active');
+
+                if (panelAktif.id === 'suhu') {
+                    konversi('suhu');
+                } else if (panelAktif.id === 'panjang') {
+                    konversi('panjang');
+                } else if (panelAktif.id === 'berat') {
+                    konversi('berat');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
