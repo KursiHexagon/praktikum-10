@@ -1,0 +1,126 @@
+<!-- 2572027 - Silalahi, Lorenzo Julio Pardamean -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game - 2572027</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="navbar">
+        <div>Waktu: <span id="time-left">30</span>s</div>
+        <div>Skor: <span id="score">0</span></div>
+    </div>
+
+    <div id="game-area">
+        <div id="overlay">
+            <div id="game-over-text" class="hidden"></div>
+            <button id="start-btn">Mulai</button>
+            <button id="restart-btn" class="hidden">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let gameTimer;
+        let spawnTimer;
+
+        const targetTypes = [
+            { points: 10, size: 120 },
+            { points: 20, size: 100 },
+            { points: 50, size: 80 }
+        ];
+        
+        const overlay = document.getElementById("overlay");
+        const timeLeftDisplay = document.getElementById('time-left');
+        const scoreDisplay = document.getElementById('score');
+        const startBtn = document.getElementById("start-btn"); 
+        const restartBtn = document.getElementById("restart-btn");
+        const gameOverText = document.getElementById('game-over-text');
+
+        startBtn.addEventListener("click", () => {
+            score = 0;
+            timeLeft = 30;
+            scoreDisplay.innerText = score;
+            timeLeftDisplay.innerText = timeLeft;
+            
+            startBtn.classList.add("hidden");
+            gameOverText.classList.add("hidden");
+            overlay.classList.add("hidden");
+            
+            clearInterval(gameTimer);
+            clearInterval(spawnTimer);
+            
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                timeLeftDisplay.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            spawnTimer = setInterval(() => {
+                if (typeof createTarget === 'function') {
+                    createTarget();
+                }
+            }, 500);
+        });
+
+        // biar restart 
+        restartBtn.addEventListener("click", () => {
+            location.reload();
+        });
+
+        function createTarget() {
+            const gameArea = document.getElementById('game-area');
+            const target = document.createElement('img');
+            target.src = 'mole.png';
+            target.alt = 'mole';
+            target.draggable = false;
+            target.classList.add('target');
+            
+            const type = targetTypes[Math.floor(Math.random() * targetTypes.length)];
+            target.style.width = type.size + 'px';
+            target.style.height = type.size + 'px';
+            
+            // random posisi molenya muncul
+            const x = Math.random() * (gameArea.clientWidth - type.size) + (type.size / 2); 
+            const y = Math.random() * (gameArea.clientHeight - type.size) + (type.size / 2); 
+            
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+            
+            gameArea.appendChild(target);
+            
+            target.addEventListener("click", () => {
+                score += type.points;
+                scoreDisplay.innerText = score;
+                target.remove();
+            });
+            
+            setTimeout(() => {
+                if (target.parentNode) {
+                    target.remove();
+                }
+            }, 1500);
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            clearInterval(spawnTimer);
+            
+            document.querySelectorAll('.target').forEach(t => t.remove());
+            
+            overlay.classList.remove("hidden"); 
+
+            gameOverText.innerText = `Skor Akhir: ` + score;
+            gameOverText.classList.remove('hidden');
+            startBtn.classList.add('hidden');
+            restartBtn.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
